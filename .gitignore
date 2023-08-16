@@ -1,0 +1,28 @@
+# Dependency directories
+node_modules/
+
+# Editor directories
+.idea/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# dotenv environment variables file
+.env
+.env.test
+.env.production
+
+package-lock.json
+
+
+
+
+
+
+
+
+
+
