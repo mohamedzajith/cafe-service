@@ -26,9 +26,7 @@ if (localConnect) {
       console.log(err, "error connecting to the database");
     });
 } else {
-  db.mongoose
-    .connect(mongoURI)
-    .then(() => console.log("mongoose connected !"));
+  db.mongoose.connect(mongoURI).then(() => console.log("mongoose connected !"));
 }
 
 const app = express();
@@ -40,5 +38,5 @@ indexRoutes(app);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log("Listening on port 5001");
+  console.log("Listening on port 5000");
 });

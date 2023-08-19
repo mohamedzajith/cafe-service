@@ -7,6 +7,8 @@ const {
   PHONE_NUMBER_PATTERN,
   EMAIL_PATTERN,
 } = require("../utils/constant");
+const { Cafe } = require("../models");
+const { isEmpty } = require("lodash");
 
 const options = {
   abortEarly: false,
@@ -31,30 +33,42 @@ const validationSchema = {
     "any.only": "Invalid Gender value. Must be one of: Male, Female",
     "any.required": "Phone number is required.",
   }),
+  cafe_id: Joi.any()
+    .external(async (value, helper) => {
+      const cafe = await Cafe.findById(value);
+      if (isEmpty(cafe)) {
+        return helper.message({
+          external: "Cafe does not exist in the collection.",
+        });
+      }
+      return value;
+    })
+    .messages({
+      "any.external": "ID does not exist in the collection.",
+    }),
 };
 
 const validateEmployee = async (req, res) => {
-  const schemaRules = Joi.object().keys(validationSchema);
-
-  const { error, value } = schemaRules.validate(req.body, options);
-
-  if (error) {
-    validationFailResponse(res, error, "Validation error");
-  } else {
-    return value;
+  try {
+    const keyList = ["name", "email_address", "phone_number", "gender"];
+    if (req.body.cafe_id) {
+      keyList.push("cafe_id");
+    }
+    const dynamicValidation = _.pick(validationSchema, keyList);
+    const schemaRules = Joi.object().keys(dynamicValidation);
+    return await schemaRules.validateAsync(req.body, options);
+  } catch (error) {
+    validationFailResponse(res, error, "Validation errorxxx");
   }
 };
 
 const validateEmployeeUpdate = async (req, res) => {
-  const dynamicValidation = _.pick(validationSchema, _.keys(req.body));
-  const schemaRules = Joi.object().keys(dynamicValidation);
-
-  const { error, value } = schemaRules.validate(req.body, options);
-
-  if (error) {
+  try {
+    const dynamicValidation = _.pick(validationSchema, _.keys(req.body));
+    const schemaRules = Joi.object().keys(dynamicValidation);
+    return await schemaRules.validateAsync(req.body, options);
+  } catch (error) {
     validationFailResponse(res, error, "Validation error");
-  } else {
-    return value;
   }
 };
 

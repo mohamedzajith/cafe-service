@@ -1,10 +1,9 @@
 const generateUniqueId = require("generate-unique-id");
+const { v4: uuidv4 } = require("uuid");
 
-const id2 = generateUniqueId({
-  length: 7,
-  useLetters: true,
-  useNumbers: true,
-});
+const generateUuid = () => {
+  return uuidv4();
+};
 
 const uniqueId = (prefix = "UI") => {
   const id = generateUniqueId({
@@ -16,5 +15,6 @@ const uniqueId = (prefix = "UI") => {
 };
 
 module.exports = {
+  generateUuid,
   uniqueId,
 };
