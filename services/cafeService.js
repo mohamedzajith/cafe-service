@@ -1,27 +1,33 @@
 const { Cafe } = require("../models/index");
-const { generateQuery, generateOptions } = require("../utils/queryBuilder");
+const { generateQuery } = require("../utils/queryBuilder");
 const {
   validateCafe,
   validateCafeUpdate,
 } = require("../schema-validation/cafeSchema");
 const { cafeDefinition } = require("../models/definitions/cafe");
-const { generateUuid, uniqueId } = require("../utils/helper");
-const { get, map, sortBy, size } = require("lodash");
+const { generateUuid } = require("../utils/helper");
+const { get, map, size, } = require("lodash");
 
 const listOfCafe = async (req, res) => {
   try {
     const query = generateQuery(req, cafeDefinition);
-    const option = generateOptions(req);
-    const cafes = await Cafe.paginate(query, {
-      ...option,
+    const cafes = await Cafe.aggregate([
+      // {
+      //   $lookup: {
+      //     from: "employee",
+      //     localField: "employee.id",
+      //     foreignField: "id",
+      //     as: "employeeDetails",
+      //   },
+      // },
+      {
+        $match: query,
+      },
+    ])
+
+    return map(cafes, ({_id, employee, ...rest }) => {
+      return { ...rest, employees: size(employee) };
     });
-    return {
-      ...cafes,
-      itemsList: map(cafes.itemsList, (cafe) => {
-        const { employee, _id, ...rest } = cafe;
-        return { ...rest, employees: size(employee) };
-      }),
-    };
   } catch (error) {
     console.error(error);
   }
